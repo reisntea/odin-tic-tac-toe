@@ -34,10 +34,16 @@ function Gameboard () {
         console.log(fullBoard);
     };
 
+    // Goes through each row and then for each value in the row sets the value to the default value.
+    const resetBoard = () => {
+        board.forEach(row => row.forEach(cell => cell.addMark(0)));
+    };
+
     return {
         makeMark,
         printBoard,
         getBoard,
+        resetBoard,
     }
 }
 
@@ -70,10 +76,12 @@ function GameController (playerOneName = "Player One", playerTwoName = "Player T
         {
             name: playerOneName,
             mark: "X",
+            points: 0,
         },
         {
             name: playerTwoName,
             mark: "O",
+            points: 0,
         }
     ];
 
@@ -85,6 +93,8 @@ function GameController (playerOneName = "Player One", playerTwoName = "Player T
         activePlayer = activePlayer === players[0] ? players[1] : players[0];
     };
 
+    // It first runs the makeMark function which returns false if it can't make a mark
+    // If the move was false (invalid), it prints the round again and doesn't switch turns.
     const playRound = (row, column) => {
         console.log(`Placing ${getActivePlayer().name}'s mark into row ${row}, column ${column}...`);
         const validMove = board.makeMark(row, column, getActivePlayer().mark);
@@ -100,26 +110,49 @@ function GameController (playerOneName = "Player One", playerTwoName = "Player T
         printNewRound();
     };
 
-
+    // First it checks the row where the mark was placed, then it checks it's column, and then it checks both diagonals
+    // currentRow is used to differentiate from the row parameter
     const checkForWinner = (row, column) => {
-        // First it checks the row where the mark was placed, then it checks it's column, and then it checks both diagonals. 
-        // currentRow is used to differentiate from the row parameter.
+        // In each case it first prints out who won,
+        // then it adds the point to the player that won and also prints out the winners score,
+        // then it resets the turns,
+        // and then it resets the board
         switch (true) {
             case (board.getBoard()[row].every((space) => space.getValue() === getActivePlayer().mark)):
                 getActivePlayer() === players[0] ? console.log(`Player 1 wins`) : console.log(`Player 2 wins`);
+                getActivePlayer().points++;
+                console.log(`${getActivePlayer().name}: ${getActivePlayer().points++}`);
                 console.log("case 1");
+                turns = 0;
+                board.printBoard();
+                board.resetBoard();
                 break;
             case (board.getBoard().map((currentRow) => currentRow[column]).every((space) => space.getValue() === getActivePlayer().mark)):
                 getActivePlayer() === players[0] ? console.log(`Player 1 wins`) : console.log(`Player 2 wins`);
+                getActivePlayer().points++;
+                console.log(`${getActivePlayer().name}: ${getActivePlayer().points++}`);
                 console.log("case 2");
+                turns = 0;
+                board.printBoard();
+                board.resetBoard();
                 break;
             case (board.getBoard()[0][0].getValue() === getActivePlayer().mark && board.getBoard()[1][1].getValue() === getActivePlayer().mark && board.getBoard()[2][2].getValue() === getActivePlayer().mark):
                 getActivePlayer() === players[0] ? console.log(`Player 1 wins`) : console.log(`Player 2 wins`);
+                getActivePlayer().points++;
+                console.log(`${getActivePlayer().name}: ${getActivePlayer().points++}`);
                 console.log("case 3");
+                turns = 0;
+                board.printBoard();
+                board.resetBoard();
                 break;
             case (board.getBoard()[2][0].getValue() === getActivePlayer().mark && board.getBoard()[1][1].getValue() === getActivePlayer().mark && board.getBoard()[0][2].getValue() === getActivePlayer().mark):
                 getActivePlayer() === players[0] ? console.log(`Player 1 wins`) : console.log(`Player 2 wins`);
+                getActivePlayer().points++;
+                console.log(`${getActivePlayer().name}: ${getActivePlayer().points++}`);
                 console.log("case 4");
+                turns = 0;
+                board.printBoard();
+                board.resetBoard();
                 break;
             default:
                 console.log("no winner");
@@ -129,6 +162,8 @@ function GameController (playerOneName = "Player One", playerTwoName = "Player T
         // So if there's no winner after nine turns it means a draw
         if (turns == 9) {
             console.log("draw");
+            turns = 0;
+            board.resetBoard();
         }
     };
 
