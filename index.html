@@ -3,12 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tic-tac-toe</title>
+    <title>Tic Tac Toe</title>
     <script src="script.js" defer></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Tic-tac-toe</h1>
+    <div id="info-container">
+        <h1>Tic Tac Toe</h1>
+        <p>Play Tic Tac Toe with a friend!</p>
+
+        <div class="scoreboard">
+            <p class="player">Player 1: </p>
+            <p id="player-one-score">0</p>
+        </div>
+        <div class="scoreboard">
+            <p class="player">Player 2: </p>
+            <p id="player-two-score">0</p>
+        </div>
+
+        <button>Reset Board</button>
+        <button>Reset Scores</button>
+    </div>
+
+    <!-- data-id goes row, then column -->
+    <div id="board-container">
+        <div class="square" data-id="00"></div>
+        <div class="square" data-id="01"></div>
+        <div class="square" data-id="02"></div>
+        <div class="square" data-id="10"></div>
+        <div class="square" data-id="11"></div>
+        <div class="square" data-id="12"></div>
+        <div class="square" data-id="20"></div>
+        <div class="square" data-id="21"></div>
+        <div class="square" data-id="22"></div>
+    </div>
     
 </body>
 </html>

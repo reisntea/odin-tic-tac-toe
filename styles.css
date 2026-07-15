@@ -1,0 +1,30 @@
+body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.scoreboard {
+    display: flex;
+    gap: 20px;
+    font-size: 32px;
+}
+
+.player {
+    font-weight: bold
+}
+
+#board-container {
+    aspect-ratio: 1 / 1;
+    background: black;
+    height: 90vh;
+
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 3px;
+}
+
+.square {
+    background: white;
+    aspect-ratio: 1 / 1;
+}
