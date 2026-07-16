@@ -21,21 +21,23 @@
             <p id="player-two-score">0</p>
         </div>
 
-        <button>Reset Board</button>
-        <button>Reset Scores</button>
+        <button class="hidden" id="reset">Reset Board</button>
     </div>
 
     <!-- data-id goes row, then column -->
-    <div id="board-container">
-        <div class="square" data-id="00"></div>
-        <div class="square" data-id="01"></div>
-        <div class="square" data-id="02"></div>
-        <div class="square" data-id="10"></div>
-        <div class="square" data-id="11"></div>
-        <div class="square" data-id="12"></div>
-        <div class="square" data-id="20"></div>
-        <div class="square" data-id="21"></div>
-        <div class="square" data-id="22"></div>
+    <div>
+        <h1 id="player-board-info">Player One's turn...</h1>
+        <div id="board-container">
+            <div class="square" data-id="00"></div>
+            <div class="square" data-id="01"></div>
+            <div class="square" data-id="02"></div>
+            <div class="square" data-id="10"></div>
+            <div class="square" data-id="11"></div>
+            <div class="square" data-id="12"></div>
+            <div class="square" data-id="20"></div>
+            <div class="square" data-id="21"></div>
+            <div class="square" data-id="22"></div>
+        </div>
     </div>
     
 </body>

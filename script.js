@@ -39,11 +39,17 @@ function Gameboard () {
         board.forEach(row => row.forEach(cell => cell.addMark(0)));
     };
 
+    // Puts a dummy value into every cell, essentially pausing the board until the reset button is clicked.
+    const pauseBoard = () => {
+        board.forEach(row => row.forEach(cell => cell.addMark(1)));
+    };
+
     return {
         makeMark,
         printBoard,
         getBoard,
         resetBoard,
+        pauseBoard,
     }
 }
 
@@ -68,9 +74,15 @@ function Cell () {
 
 // Controls the data for each player and whose turn it is.
 // Also checks if someone makes a winning move.
+// And sends any changes or updates to the screenController to update the UI as well.
 function GameController (playerOneName = "Player One", playerTwoName = "Player Two") {
+    const resetButton = document.getElementById("reset");
+
     const board = Gameboard();
+    const screen = ScreenController();
     let turns = 0;
+    let row = 0;
+    let column = 0;
 
     const players = [
         {
@@ -93,6 +105,28 @@ function GameController (playerOneName = "Player One", playerTwoName = "Player T
         activePlayer = activePlayer === players[0] ? players[1] : players[0];
     };
 
+    // Event listener for the board container that gets the data-id of the square that was clicked
+    // and separates it to get the row and column so that it can run playRound
+    document.querySelector("#board-container").addEventListener("click", (event) =>{
+        if (event.target.matches(".square")) {
+            currentId = event.target.dataset.id;
+            row = currentId.at(0);
+            column = currentId.at(1);
+
+            playRound(row, column);
+        }
+    });
+
+    // Event for the reset button, placed here bc this function can edit the board while the screenController can't.
+    resetButton.addEventListener("click", (event) => {
+        board.resetBoard();
+        switchPlayerTurn();
+        screen.toggleResetButton();
+        screen.updatePlayerTurn(getActivePlayer().name);
+        screen.resetBoardDisplay();
+        printNewRound();
+    });
+
     // It first runs the makeMark function which returns false if it can't make a mark
     // If the move was false (invalid), it prints the round again and doesn't switch turns.
     const playRound = (row, column) => {
@@ -105,9 +139,13 @@ function GameController (playerOneName = "Player One", playerTwoName = "Player T
         }
 
         turns++;
-        checkForWinner(row, column);
-        switchPlayerTurn();
-        printNewRound();
+        screen.addMarks(`${row}${column}`, getActivePlayer().mark);
+        const isWinner = checkForWinner(row, column);
+        if (isWinner === false) {
+            switchPlayerTurn();
+            screen.updatePlayerTurn(getActivePlayer().name);
+            printNewRound();
+        }
     };
 
     // First it checks the row where the mark was placed, then it checks it's column, and then it checks both diagonals
@@ -115,55 +153,67 @@ function GameController (playerOneName = "Player One", playerTwoName = "Player T
     const checkForWinner = (row, column) => {
         // In each case it first prints out who won,
         // then it adds the point to the player that won and also prints out the winners score,
+        // then it updates the UI with the new info,
         // then it resets the turns,
-        // and then it resets the board
+        // and then pauses the board
         switch (true) {
             case (board.getBoard()[row].every((space) => space.getValue() === getActivePlayer().mark)):
                 getActivePlayer() === players[0] ? console.log(`Player 1 wins`) : console.log(`Player 2 wins`);
                 getActivePlayer().points++;
-                console.log(`${getActivePlayer().name}: ${getActivePlayer().points++}`);
-                console.log("case 1");
+                console.log(`${getActivePlayer().name}: ${getActivePlayer().points}`);
+                screen.updateScore(getActivePlayer().name, getActivePlayer().points);
+                screen.updateBoardHeader(getActivePlayer().name);
+                screen.toggleResetButton();
                 turns = 0;
                 board.printBoard();
-                board.resetBoard();
+                board.pauseBoard();
                 break;
             case (board.getBoard().map((currentRow) => currentRow[column]).every((space) => space.getValue() === getActivePlayer().mark)):
                 getActivePlayer() === players[0] ? console.log(`Player 1 wins`) : console.log(`Player 2 wins`);
                 getActivePlayer().points++;
-                console.log(`${getActivePlayer().name}: ${getActivePlayer().points++}`);
-                console.log("case 2");
+                console.log(`${getActivePlayer().name}: ${getActivePlayer().points}`);
+                screen.updateScore(getActivePlayer().name, getActivePlayer().points);
+                screen.updateBoardHeader(getActivePlayer().name);
+                screen.toggleResetButton();
                 turns = 0;
                 board.printBoard();
-                board.resetBoard();
+                board.pauseBoard();
                 break;
             case (board.getBoard()[0][0].getValue() === getActivePlayer().mark && board.getBoard()[1][1].getValue() === getActivePlayer().mark && board.getBoard()[2][2].getValue() === getActivePlayer().mark):
                 getActivePlayer() === players[0] ? console.log(`Player 1 wins`) : console.log(`Player 2 wins`);
                 getActivePlayer().points++;
-                console.log(`${getActivePlayer().name}: ${getActivePlayer().points++}`);
-                console.log("case 3");
+                console.log(`${getActivePlayer().name}: ${getActivePlayer().points}`);
+                screen.updateScore(getActivePlayer().name, getActivePlayer().points);
+                screen.updateBoardHeader(getActivePlayer().name);
+                screen.toggleResetButton();
                 turns = 0;
                 board.printBoard();
-                board.resetBoard();
+                board.pauseBoard();
                 break;
             case (board.getBoard()[2][0].getValue() === getActivePlayer().mark && board.getBoard()[1][1].getValue() === getActivePlayer().mark && board.getBoard()[0][2].getValue() === getActivePlayer().mark):
                 getActivePlayer() === players[0] ? console.log(`Player 1 wins`) : console.log(`Player 2 wins`);
                 getActivePlayer().points++;
-                console.log(`${getActivePlayer().name}: ${getActivePlayer().points++}`);
-                console.log("case 4");
+                console.log(`${getActivePlayer().name}: ${getActivePlayer().points}`);
+                screen.updateScore(getActivePlayer().name, getActivePlayer().points);
+                screen.updateBoardHeader(getActivePlayer().name);
+                screen.toggleResetButton();
                 turns = 0;
                 board.printBoard();
-                board.resetBoard();
+                board.pauseBoard();
                 break;
             default:
                 console.log("no winner");
-        }
-
-        // If 9 turns pass that means the board is completely filled
-        // So if there's no winner after nine turns it means a draw
-        if (turns == 9) {
-            console.log("draw");
-            turns = 0;
-            board.resetBoard();
+                // If 9 turns pass that means the board is completely filled
+                // So if there's no winner after nine turns it means a draw
+                if (turns == 9) {
+                    console.log("draw");
+                    screen.updateBoardHeader("Draw");
+                    screen.toggleResetButton();
+                    turns = 0;
+                    board.pauseBoard();
+                    return;
+                }
+                return false;
         }
     };
 
@@ -175,10 +225,65 @@ function GameController (playerOneName = "Player One", playerTwoName = "Player T
 
     // Start of game message
     printNewRound();
+}
+
+// Contains functions that the screen with the proper info
+// All of which are called by the gameController when appropriate
+function ScreenController () {
+    const playerBoardDiv = document.getElementById("player-board-info");
+    const playerOneScoreDiv = document.getElementById("player-one-score");
+    const playerTwoScoreDiv = document.getElementById("player-two-score");
+    const resetButton = document.getElementById("reset");
+    const squares = document.querySelectorAll(".square");
+
+    // Adds the appropriate mark as a class that changes the background of the div
+    const addMarks = (id, mark) => {
+        if (mark === "X") {
+            document.querySelector(`[data-id="${id}"]`).classList.add("x-mark");
+        } else if (mark === "O") {
+            document.querySelector(`[data-id="${id}"]`).classList.add("o-mark");
+        }
+    };
+
+    // Updates the text above the board to show the current player
+    const updatePlayerTurn = (player) => {
+        playerBoardDiv.textContent = `${player}'s turn...`;
+    }
+
+    // Updates the score for the appropriate player
+    const updateScore = (player, score) => {
+        player === "Player One" ? playerOneScoreDiv.textContent = score: playerTwoScoreDiv.textContent = score;
+    };
+
+    // Updates the text above the board to show who won or if it was a draw
+    const updateBoardHeader = (status) => {    
+        if (status === "Player One" || status === "Player Two") {
+            playerBoardDiv.textContent = `${status} wins!`;
+        } else if (status === "Draw") {
+            playerBoardDiv.textContent = `It's a Draw!`;
+        }
+    };
+
+    // Shows the reset button when the game ends
+    const toggleResetButton = () => {
+        resetButton.classList.toggle("hidden");
+    };
+
+    // Removes all marks from display
+    const resetBoardDisplay = () => {
+        squares.forEach((square) => {
+            square.classList.remove("x-mark", "o-mark");
+        });
+    }
 
     return {
-        playRound,
+        addMarks,
+        updatePlayerTurn,
+        updateScore,
+        updateBoardHeader,
+        toggleResetButton,
+        resetBoardDisplay,
     }
 }
 
-const game = GameController();
+GameController();

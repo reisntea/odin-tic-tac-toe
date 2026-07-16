@@ -13,10 +13,18 @@ body {
     font-weight: bold
 }
 
+.hidden {
+    display: none;
+}
+
+#player-turn-display {
+    font-size: 32px;
+}
+
 #board-container {
     aspect-ratio: 1 / 1;
     background: black;
-    height: 90vh;
+    height: 80vh;
 
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -27,4 +35,18 @@ body {
 .square {
     background: white;
     aspect-ratio: 1 / 1;
+}
+
+.x-mark {
+    background-image: url("./images/x-mark.svg");
+    background-repeat: no-repeat;
+    background-size: 110%;
+    background-position: center;
+}
+
+.o-mark {
+    background-image: url("./images/circle-outline.svg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
 }
